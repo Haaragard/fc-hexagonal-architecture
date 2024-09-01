@@ -1,0 +1,7 @@
+services:
+  app:
+    build: .docker/php
+    ports:
+      - "9000:9000"
+    volumes:
+      - .:/var/www/html
