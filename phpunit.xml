@@ -17,5 +17,10 @@
     <php>
         <ini name="error_reporting" value="-1" />
         <server name="KERNEL_DIR" value="app/" />
+<!--        <env name="DB_HOST" value="db.sqlite3" />-->
+        <env name="DB_HOST" value="sqlite::memory:" />
+<!--        <env name="DB_NAME" value="test_db" />-->
+<!--        <env name="DB_USER" value="root" />-->
+<!--        <env name="DB_PASS" value="password" />-->
     </php>
 </phpunit>
