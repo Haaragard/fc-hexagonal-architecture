@@ -178,12 +178,7 @@ class ProductServiceTest extends TestCase
 
         $this->productPersistenceMock->expects($this->once())
             ->method('disable')
-            ->with($product)
-            ->willReturnCallback(
-                function (Product $product) {
-                    $product->disable();
-                }
-            );
+            ->with($product);
 
         $this->productService->disable($product);
 

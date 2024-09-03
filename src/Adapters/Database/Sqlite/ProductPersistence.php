@@ -87,8 +87,6 @@ readonly class ProductPersistence
 
     public function enable(ProductInterface $product): void
     {
-        $product->enable();
-
         $statement = $this->connection->prepare('UPDATE products SET status = :status WHERE id = :id');
         if ($statement === false) {
             throw new RuntimeException('Failed to prepare the statement.');
@@ -102,8 +100,6 @@ readonly class ProductPersistence
 
     public function disable(ProductInterface $product): void
     {
-        $product->disable();
-
         $statement = $this->connection->prepare('UPDATE products SET status = :status WHERE id = :id');
         if ($statement === false) {
             throw new RuntimeException('Failed to prepare the statement.');

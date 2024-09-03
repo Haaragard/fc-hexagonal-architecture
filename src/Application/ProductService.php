@@ -46,6 +46,8 @@ readonly class ProductService implements ProductServiceInterface
      */
     public function enable(ProductInterface $product): void
     {
+        $product->enable();
+
         $this->productPersistence->enable($product);
     }
 
@@ -54,6 +56,8 @@ readonly class ProductService implements ProductServiceInterface
      */
     public function disable(ProductInterface $product): void
     {
+        $product->disable();
+
         $this->productPersistence->disable($product);
     }
 }

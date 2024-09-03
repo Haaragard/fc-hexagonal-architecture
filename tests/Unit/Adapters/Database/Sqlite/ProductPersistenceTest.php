@@ -242,12 +242,8 @@ class ProductPersistenceTest extends TestCase
             id: Uuid::uuid4()->toString(),
             name: 'Product 1',
             price: 100,
-            status: ProductInterface::DISABLED
+            status: ProductInterface::ENABLED
         );
-
-        $product->setName('Product 2');
-        $product->setPrice(200);
-        $product->setStatus(ProductInterface::ENABLED);
 
         $this->pdo->expects($this->once())
             ->method('prepare')
@@ -266,12 +262,8 @@ class ProductPersistenceTest extends TestCase
             id: Uuid::uuid4()->toString(),
             name: 'Product 1',
             price: 100,
-            status: ProductInterface::DISABLED
+            status: ProductInterface::ENABLED
         );
-
-        $product->setName('Product 2');
-        $product->setPrice(200);
-        $product->setStatus(ProductInterface::ENABLED);
 
         $this->pdo->expects($this->once())
             ->method('prepare')
@@ -282,8 +274,8 @@ class ProductPersistenceTest extends TestCase
             ->method('execute')
             ->with([
                 'id' => $product->getId(),
-                'name' => 'Product 2',
-                'price' => 200,
+                'name' => 'Product 1',
+                'price' => 100,
                 'status' => ProductInterface::ENABLED,
             ])
             ->willReturn(false);
@@ -300,7 +292,7 @@ class ProductPersistenceTest extends TestCase
             id: Uuid::uuid4()->toString(),
             name: 'Product 1',
             price: 100,
-            status: ProductInterface::DISABLED
+            status: ProductInterface::ENABLED
         );
 
         $this->pdo->expects($this->once())
@@ -383,8 +375,6 @@ class ProductPersistenceTest extends TestCase
             ->willReturn(true);
 
         $this->productPersistence->disable($product);
-
-        $this->assertEquals(ProductInterface::DISABLED, $product->getStatus());
     }
 
     public function testDisableThrowsExceptionWhenStatementNotPrepared(): void
