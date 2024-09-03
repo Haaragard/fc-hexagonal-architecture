@@ -36,6 +36,14 @@ readonly class ProductService implements ProductServiceInterface
     /*
      * @inheritDoc
      */
+    public function save(ProductInterface $product): void
+    {
+        $this->productPersistence->save($product);
+    }
+
+    /*
+     * @inheritDoc
+     */
     public function enable(ProductInterface $product): void
     {
         $this->productPersistence->enable($product);

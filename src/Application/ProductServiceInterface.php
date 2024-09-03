@@ -2,27 +2,32 @@
 
 namespace App\Application;
 
-use Exception;
+use Throwable;
 
 interface ProductServiceInterface
 {
     /**
-     * @throws Exception
+     * @throws Throwable
      */
     public function get(string $id): ProductInterface;
 
     /**
-     * @throws Exception
+     * @throws Throwable
      */
     public function create(string $name, int $price): ProductInterface;
 
     /**
-     * @throws Exception
+     * @throws Throwable
+     */
+    public function save(ProductInterface $product): void;
+
+    /**
+     * @throws Throwable
      */
     public function enable(ProductInterface $product): void;
 
     /**
-     * @throws Exception
+     * @throws Throwable
      */
     public function disable(ProductInterface $product): void;
 }

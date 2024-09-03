@@ -105,6 +105,45 @@ class ProductServiceTest extends TestCase
         $this->assertInstanceOf(Product::class, $product);
     }
 
+    public function testSaveProduct(): void
+    {
+        $product = new Product(
+            id: Uuid::uuid4()->toString(),
+            name: 'Product 1',
+            price: 1,
+            status: Product::DISABLED
+        );
+
+        $this->productPersistenceMock->expects($this->once())
+            ->method('save')
+            ->with($product);
+
+        $this->productService->save($product);
+
+        $this->assertEquals('Product 1', $product->getName());
+        $this->assertEquals(1, $product->getPrice());
+        $this->assertEquals(Product::DISABLED, $product->getStatus());
+    }
+
+    public function testSaveProductThrowsError(): void
+    {
+        $product = new Product(
+            id: Uuid::uuid4()->toString(),
+            name: 'Product 1',
+            price: 1,
+            status: Product::DISABLED
+        );
+
+        $this->productPersistenceMock->expects($this->once())
+            ->method('save')
+            ->willThrowException(new Exception('Product not saved.'));
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Product not saved.');
+
+        $this->productService->save($product);
+    }
+
     public function testEnable(): void
     {
         $product = new Product(
