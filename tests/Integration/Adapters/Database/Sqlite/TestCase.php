@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Unit\Adapters\Database\Sqlite;
+namespace Test\Integration\Adapters\Database\Sqlite;
 
 use Override;
 use PDO;
