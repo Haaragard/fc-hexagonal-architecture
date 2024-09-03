@@ -30,9 +30,15 @@ interface ProductInterface
 
     public function getName(): string;
 
+    public function setName(string $name): void;
+
     public function getStatus(): string;
 
+    public function setStatus(string $status): void;
+
     public function getPrice(): int;
+
+    public function setPrice(int $price): void;
 
     public function isEnabled(): bool;
 }

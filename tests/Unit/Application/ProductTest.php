@@ -7,6 +7,7 @@ use Exception;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
+use RuntimeException;
 
 class ProductTest extends TestCase
 {
@@ -127,12 +128,42 @@ class ProductTest extends TestCase
         $this->assertEquals($id, $product->getId());
     }
 
+    public function testSetId(): void
+    {
+        $id = Uuid::uuid4()->toString();
+        $product = new Product(Uuid::uuid4()->toString(), 'Product 1', 10);
+
+        $product->setId($id);
+
+        $this->assertEquals($id, $product->getId());
+    }
+
+    public function testSetIdThrowError(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The product ID is required.');
+
+        $product = new Product(Uuid::uuid4()->toString(), 'Product 1', 10);
+
+        $product->setId('');
+    }
+
     public function testGetName(): void
     {
         $name = 'Product 1';
         $product = new Product(Uuid::uuid4()->toString(), $name, 10);
 
         $this->assertEquals($name, $product->getName());
+    }
+
+    public function testGetNameThrowError(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The product name is required.');
+
+        $product = new Product(Uuid::uuid4()->toString(), '', 10);
+
+        $this->assertEquals('', $product->getName());
     }
 
     public function testGetStatus(): void
@@ -142,11 +173,50 @@ class ProductTest extends TestCase
         $this->assertEquals(Product::DISABLED, $product->getStatus());
     }
 
+    public function testSetStatus(): void
+    {
+        $product = new Product(Uuid::uuid4()->toString(), 'Product 1', 10);
+
+        $product->setStatus(Product::ENABLED);
+
+        $this->assertEquals(Product::ENABLED, $product->getStatus());
+    }
+
+    public function testSetStatusThrowError(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The product status is invalid.');
+
+        $product = new Product(Uuid::uuid4()->toString(), 'Product 1', 10);
+
+        $product->setStatus('invalid');
+    }
+
     public function testGetPrice(): void
     {
         $price = 10;
         $product = new Product(Uuid::uuid4()->toString(), 'Product 1', $price);
 
         $this->assertEquals($price, $product->getPrice());
+    }
+
+    public function testSetPrice(): void
+    {
+        $price = 10;
+        $product = new Product(Uuid::uuid4()->toString(), 'Product 1', 0);
+
+        $product->setPrice($price);
+
+        $this->assertEquals($price, $product->getPrice());
+    }
+
+    public function testSetPriceThrowError(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The product price must be zero or greater to be valid.');
+
+        $product = new Product(Uuid::uuid4()->toString(), 'Product 1', -1);
+
+        $product->setPrice(0);
     }
 }
