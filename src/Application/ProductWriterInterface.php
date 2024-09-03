@@ -14,6 +14,11 @@ interface ProductWriterInterface
     /**
      * @throws Throwable
      */
+    public function save(ProductInterface $product): void;
+
+    /**
+     * @throws Throwable
+     */
     public function enable(ProductInterface $product): void;
 
     /**

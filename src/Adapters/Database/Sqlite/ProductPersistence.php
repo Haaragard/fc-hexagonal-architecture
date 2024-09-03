@@ -19,12 +19,22 @@ readonly class ProductPersistence
     public function get(string $id): ProductInterface
     {
         $statement = $this->connection->prepare('SELECT id, name, price, status FROM products WHERE id = :id');
-        $statement->execute(['id' => $id]);
+        if ($statement === false) {
+            throw new RuntimeException('Failed to prepare the statement.');
+        }
+
+        $result = $statement->execute(['id' => $id]);
+        if (! $result) {
+            throw new RuntimeException('Product not found.');
+        }
 
         /**
          * @var int[]|string[] $result
          */
         $result = $statement->fetch(mode: PDO::FETCH_ASSOC);
+        if ($result === false) {
+            throw new RuntimeException('Failed to retrieve Product.');
+        }
 
         return new Product(
             id: $result['id'],
@@ -39,17 +49,39 @@ readonly class ProductPersistence
         $id = $this->uuidFactory->uuid4()->toString();
         $product->setId($id);
 
-        $statement = $this->connection->prepare('INSERT INTO products (id, name, price, status) VALUES (:id, :name, :price, :status)');
-        $statement->execute([
+        $statement = $this->connection
+            ->prepare('INSERT INTO products (id, name, price, status) VALUES (:id, :name, :price, :status)');
+        if ($statement === false) {
+            throw new RuntimeException('Failed to prepare the statement.');
+        }
+
+        $result = $statement->execute([
             'id' => $product->getId(),
             'name' => $product->getName(),
             'price' => $product->getPrice(),
             'status' => $product->getStatus(),
         ]);
-
-        $lastInsertedId = $this->connection->lastInsertId('products');
-        if (! $lastInsertedId) {
+        if (! $result) {
             throw new RuntimeException('The last inserted ID is not the same as the product ID.');
+        }
+    }
+
+    public function save(ProductInterface $product): void
+    {
+        $statement = $this->connection
+            ->prepare('UPDATE products SET name = :name, price = :price, status = :status WHERE id = :id');
+        if ($statement === false) {
+            throw new RuntimeException('Failed to prepare the statement.');
+        }
+
+        $result = $statement->execute([
+            'id' => $product->getId(),
+            'name' => $product->getName(),
+            'price' => $product->getPrice(),
+            'status' => $product->getStatus(),
+        ]);
+        if (! $result) {
+            throw new RuntimeException('The product could not be saved.');
         }
     }
 
@@ -58,7 +90,14 @@ readonly class ProductPersistence
         $product->enable();
 
         $statement = $this->connection->prepare('UPDATE products SET status = :status WHERE id = :id');
-        $statement->execute(['id' => $product->getId(), 'status' => ProductInterface::ENABLED]);
+        if ($statement === false) {
+            throw new RuntimeException('Failed to prepare the statement.');
+        }
+
+        $result = $statement->execute(['id' => $product->getId(), 'status' => ProductInterface::ENABLED]);
+        if (! $result) {
+            throw new RuntimeException('The product could not be enabled.');
+        }
     }
 
     public function disable(ProductInterface $product): void
@@ -66,6 +105,13 @@ readonly class ProductPersistence
         $product->disable();
 
         $statement = $this->connection->prepare('UPDATE products SET status = :status WHERE id = :id');
-        $statement->execute(['id' => $product->getId(), 'status' => ProductInterface::DISABLED]);
+        if ($statement === false) {
+            throw new RuntimeException('Failed to prepare the statement.');
+        }
+
+        $result = $statement->execute(['id' => $product->getId(), 'status' => ProductInterface::DISABLED]);
+        if (! $result) {
+            throw new RuntimeException('The product could not be disabled.');
+        }
     }
 }
