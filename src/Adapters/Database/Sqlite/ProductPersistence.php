@@ -30,9 +30,9 @@ readonly class ProductPersistence implements ProductPersistenceInterface
         }
 
         /**
-         * @var int[]|string[] $result
+         * @var int[]|string[]|false $result
          */
-        $result = $statement->fetch(mode: PDO::FETCH_ASSOC);
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {
             throw new RuntimeException('Failed to retrieve Product.');
         }
