@@ -4,11 +4,12 @@ namespace App\Adapters\Database\Sqlite;
 
 use App\Application\Product;
 use App\Application\ProductInterface;
+use App\Application\ProductPersistenceInterface;
 use PDO;
 use Ramsey\Uuid\UuidFactoryInterface;
 use RuntimeException;
 
-readonly class ProductPersistence
+readonly class ProductPersistence implements ProductPersistenceInterface
 {
     public function __construct(
         private PDO $connection,
