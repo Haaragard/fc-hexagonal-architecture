@@ -4,11 +4,10 @@ namespace App\Adapters\Cli;
 
 use App\Application\ProductServiceInterface;
 
-class Product
+readonly class Product
 {
-    public function __construct(
-        private ProductServiceInterface $productService
-    ) {
+    public function __construct(private ProductServiceInterface $productService)
+    {
     }
 
     public function run(
@@ -16,7 +15,7 @@ class Product
         string $productId,
         string $productName,
         int $productPrice
-    ) {
+    ): void {
         switch ($action) {
             case 'create': {
                 $this->create($productName, $productPrice);
