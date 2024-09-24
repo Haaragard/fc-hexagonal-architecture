@@ -1,7 +1,8 @@
 services:
   app:
     build: .docker/php
+    entrypoint: 'bash -c "php -S 0.0.0.0:80 /var/www/html/main/http_server.php"'
     ports:
-      - "9000:9000"
+      - "9000:80"
     volumes:
       - .:/var/www/html
