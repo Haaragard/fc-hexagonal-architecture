@@ -3,6 +3,7 @@
 namespace App\Adapters\Web\Server;
 
 use App\Adapters\Web\Request\Request;
+use App\Adapters\Web\Response\Response;
 use App\Adapters\Web\Route\Router;
 use App\Application\ProductInterface;
 use App\Application\ProductServiceInterface;
@@ -12,18 +13,22 @@ use Throwable;
 readonly class HttpServer
 {
     private Request $request;
+    private Response $response;
 
     public function __construct(
-        private ProductServiceInterface $productService
+        private ProductServiceInterface $productService,
+        ?Request $request = null,
+        ?Response $response = null
     ) {
-        $this->request = new Request();
+        $this->request = $request ?? new Request();
+        $this->response = $response ?? new Response();
     }
 
     public function run(): void
     {
         try {
             $method = $this->request->getMethod();
-            $uri = $this->request->sanitizedUri();
+            $uri = $this->request->getSanitizedUri();
 
             $executableMethod = Router::getExecutableMethod($method, $uri);
 
@@ -60,40 +65,57 @@ readonly class HttpServer
     {
         $product = $this->productService->create($productName, $productPrice);
 
-        echo sprintf('Product created with ID: %s', $product->getId()) . PHP_EOL;
-    }
-
-    private function findProduct(string $productId): ProductInterface
-    {
-        return $this->productService->get($productId);
+        $this->response->json([
+            'message' => 'Product created',
+            'data' => [
+                'product' => [
+                    'id' => $product->getId(),
+                ],
+            ],
+        ], 201);
     }
 
     private function getProduct(string $productId): void
     {
         $product = $this->findProduct($productId);
 
-        echo sprintf(
-            'Product with ID: %s, Name: %s, Price: %d and Status: %s',
-            $product->getId(),
-            $product->getName(),
-            $product->getPrice(),
-            $product->getStatus()
-        ) . PHP_EOL;
+        $this->response->json([
+            'message' => 'Product found',
+            'data' => [
+                'product' => [
+                    'id' => $product->getId(),
+                    'name' => $product->getName(),
+                    'price' => $product->getPrice(),
+                    'status' => $product->getStatus(),
+                ],
+            ],
+        ]);
     }
 
     private function enableProduct(string $productId): void
     {
-        $product = $this->findProduct($this->request->getParam('id'));
+        $product = $this->findProduct($productId);
         $this->productService->enable($product);
 
-        echo sprintf('Product with ID: %s enabled', $productId) . PHP_EOL;
+        $this->response->json([
+            'message' => 'Product enabled',
+            'data' => [],
+        ], 201);
     }
 
     private function disableProduct(string $productId): void
     {
-        $product = $this->findProduct($this->request->getParam('id'));
+        $product = $this->findProduct($productId);
         $this->productService->disable($product);
 
-        echo sprintf('Product with ID: %s disabled', $productId) . PHP_EOL;
+        $this->response->json([
+            'message' => 'Product disabled',
+            'data' => [],
+        ], 201);
+    }
+
+    private function findProduct(string $productId): ProductInterface
+    {
+        return $this->productService->get($productId);
     }
 }
