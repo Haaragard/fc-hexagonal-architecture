@@ -7,6 +7,8 @@ use RuntimeException;
 
 readonly class Request
 {
+    private PhpInput $input;
+
     /**
      * @var array<string, mixed> $params
      */
@@ -21,33 +23,21 @@ readonly class Request
 
     private string $uri;
 
-    public function __construct()
+    public function __construct(?PhpInput $input = null)
     {
-        $this->setParams();
+        $this->input = $input ?? new PhpInput();
+        $this->params = array_merge(
+            $this->input->getGet(),
+            $this->input->getPost(),
+            $this->input->getJson()
+        );
         $this->server = $_SERVER;
-        $this->method = RequestMethod::from($this->server['REQUEST_METHOD']);
+        $this->method = RequestMethod::tryFrom($this->server['REQUEST_METHOD']) ?? RequestMethod::GET;
         $this->uri = filter_var(
             value: $this->server['REQUEST_URI'],
             filter: FILTER_SANITIZE_URL,
             options: FILTER_NULL_ON_FAILURE
-        ) ?? '';
-    }
-
-    private function setParams(): void
-    {
-        $params = array_merge($_GET, $_POST);
-
-        $requestBody = file_get_contents('php://input') ?: '';
-
-        /**
-         * @var null|array<string, mixed> $requestJson
-         */
-        $requestJson = json_decode($requestBody, true) ?: [];
-        if (is_null($requestJson)) {
-            throw new RuntimeException('Invalid JSON');
-        }
-
-        $this->params = array_merge($params, $requestJson);
+        ) ?? '/';
     }
 
     /**
@@ -72,21 +62,18 @@ readonly class Request
         return $this->method;
     }
 
-    public function uri(): string
+    public function getUri(): string
     {
         return $this->uri;
     }
 
-    public function sanitizedUri(): string
+    public function getSanitizedUri(): string
     {
-        $uri = $this->uri();
-
-        if (str_contains($uri, '?')) {
-            $position = strpos($uri, '?') ?: 0;
-
-            return substr($uri, 0, $position);
+        $sanitizedUrl = strtok($this->getUri(), '?');
+        if (!$sanitizedUrl) {
+            return '/';
         }
 
-        return $uri;
+        return $sanitizedUrl;
     }
 }
